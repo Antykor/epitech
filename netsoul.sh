@@ -7,7 +7,6 @@
 # Version: 3 (4-2014)
 
 REMOTE_IP="8.8.4.4"
-WLANSTATE=$(iwconfig wlan0 | grep "Access Point" | cut -d: -f4)
 MSG=0
 
 function network_wait
