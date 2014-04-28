@@ -11,7 +11,7 @@ MSG=0
 
 function network_wait
 {
-    GATEWAY=$(route -n|grep "UG"|grep -v "UGH"|cut -f 10 -d " ")
+    GATEWAY=$(ip r | awk '/^def/{print $3}')
     if [ -z "$GATEWAY" ]
     then
 	if [ $MSG -ne 1 ]
