@@ -75,6 +75,7 @@ function ping_network
 function print
 {
     logger "Netsoul: $1"
+    notify-send 'Netsoul' "$1" --icon=dialog-information
 }
 
 network_wait
