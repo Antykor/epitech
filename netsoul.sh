@@ -4,7 +4,7 @@
 # This script implies using a modified ns_auth
 #
 # Written By: Alpha14 (contact@alpha14.com)
-# Version: 3 (4-2014)
+# Version: 4 (5-2014)
 
 remote_ip="8.8.4.4"
 msg=0
@@ -79,7 +79,7 @@ function ping_network
 
 function print
 {
-    if [ $msg -ne $2 ]
+    if [ "$msg" -ne "$2" ]
     then
 	logger "Netsoul: $1"
 	if [ "$verbose" = true ]
