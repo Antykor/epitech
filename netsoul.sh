@@ -11,6 +11,7 @@ msg=0
 verbose='false'
 user=''
 
+# Arguments
 while getopts 'u:v' flag; do
   case "${flag}" in
     u) user=${OPTARG} ;;
@@ -19,7 +20,16 @@ while getopts 'u:v' flag; do
   esac
 done
 
-function network_wait
+control_c()
+{
+    message "Exiting (SIGINIT)"
+    exit $?
+}
+
+# Trap keyboard interrupt (CTRL+C)
+trap control_c SIGINT
+
+network_wait()
 {
     gateway=$(ip r | awk '/^def/{print $3}')
     if [ -z "$gateway" ]
@@ -32,7 +42,7 @@ function network_wait
     fi
 }
 
-function ping_ns
+ping_ns()
 {
     if ping -q -w 1 -c1 ${gateway} &> /dev/null
     then
@@ -45,57 +55,58 @@ function ping_ns
     else
 	print "Failed to contact gateway" 2
 	sleep 1
-	ping_ns
+	network_wait
     fi
 }
 
-function ns_connect
+ns_connect()
 {
-    print "Executing ns_auth"
+    print "Executing ns_auth" 3
     if [ -n "$user" ]
     then
-	message "launching ns_auth with $user"
+	message "Launching ns_auth with user $user"
 	ns_auth -u $user
     else
-	message "launching ns_auth"
+	message "Launching ns_auth"
 	ns_auth
     fi
     sleep 1
     ping_network
 }
 
-function ping_network
+ping_network()
 {
     if ping -q -w 1 -c1 ${remote_ip} &> /dev/null
     then
-	print "Network up" 3
+	print "Network up" 4
 	sleep 4
 	ping_network
     else
-        print "Failed to contact network" 4
+        print "Failed to contact network" 5
 	ping_ns
     fi
 }
 
-function print
+print()
 {
-    if [ "$msg" -ne "$2" ]
+    if [ $msg -ne $2 ]
     then
 	logger "Netsoul: $1"
 	if [ "$verbose" = true ]
 	then
 	    echo "Netsoul: $1"
 	fi
-	notify-send 'Netsoul' "$1" --icon=dialog-information -t 1800
+	notify-send 'Netsoul' "$1" --icon=dialog-information -t 1500
     fi
     msg=$2
 }
 
-function message
+message()
 {
     if [ "$verbose" = true ]
     then
-	echo $1
+	logger "Netsoul: $1"
+	echo "Netsoul: $1"
     fi
 }
 
