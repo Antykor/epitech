@@ -4,9 +4,9 @@
 # This script implies using a modified ns_auth
 #
 # Written By: Alpha14 (contact@alpha14.com)
-# Version: 4 (5-2014)
+# Version: 5 (5-2014)
 
-remote_ip="8.8.4.4"
+remote_ip="google.fr"
 msg=0
 verbose='false'
 user=''
@@ -44,9 +44,9 @@ network_wait()
 
 ping_ns()
 {
-    if ping -q -w 1 -c1 ${gateway} &> /dev/null
+    if ping -q -w 3 ${gateway} &> /dev/null
     then
-	if ping -q -w 1 -c1 ${remote_ip} &> /dev/null
+	if ping -q -w 3 ${remote_ip} &> /dev/null
 	then
 	    ping_network
 	else
@@ -61,7 +61,7 @@ ping_ns()
 
 ns_connect()
 {
-    print "Executing ns_auth" 3
+    #print "Executing ns_auth" 3
     if [ -n "$user" ]
     then
 	message "Launching ns_auth with user $user"
@@ -76,7 +76,7 @@ ns_connect()
 
 ping_network()
 {
-    if ping -q -w 1 -c1 ${remote_ip} &> /dev/null
+    if ping -q -w 3 ${remote_ip} &> /dev/null
     then
 	print "Network up" 4
 	sleep 4
@@ -96,7 +96,7 @@ print()
 	then
 	    echo "Netsoul: $1"
 	fi
-	notify-send 'Netsoul' "$1" --icon=dialog-information -t 1500
+	notify-send 'Netsoul' "$1" --icon=dialog-information -t 2000
     fi
     msg=$2
 }
