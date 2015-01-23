@@ -1,2 +1,2 @@
-epitech
+epitech scripts
 =======

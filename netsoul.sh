@@ -1,15 +1,18 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Description: Bash script to connect automatically to the netsoul server
-# This script implies using a modified ns_auth
+# You need a modified ns_auth to use this script
 #
 # Written By: Alpha14 (contact@alpha14.com)
-# Version: 5 (5-2014)
+# (1-2015)
 
+version=5
 remote_ip="google.fr"
+ns_server="ns-server.epitech.net"
 msg=0
 verbose='false'
 user=''
+tries=0
 
 # Arguments
 while getopts 'u:v' flag; do
@@ -44,70 +47,111 @@ network_wait()
 
 ping_ns()
 {
-    if ping -q -w 3 ${gateway} &> /dev/null
+    if ping -q -w 2 ${gateway} &> /dev/null
     then
-	if ping -q -w 3 ${remote_ip} &> /dev/null
-	then
-	    ping_network
-	else
-	    ns_connect
-	fi
+	wait_ns
     else
-	print "Failed to contact gateway" 2
+	print "Failed to contact gateway"
 	sleep 1
 	network_wait
     fi
 }
 
+
+wait_ns()
+{
+    if ping -q -w 2 ${ns_server} &> /dev/null
+    then
+	ping_remote
+    else
+	print "Unable to join netsoul server"
+	sleep 1
+	ping_ns
+    fi
+}
+
+ping_remote()
+{
+    if ping -q -w 2 ${remote_ip} &> /dev/null
+    then
+	ping_network
+    else
+	sleep 1
+	ns_connect
+    fi
+}
+
 ns_connect()
 {
-    #print "Executing ns_auth" 3
+
+    if [ "$tries" -ge 3 ]
+    then
+        print "Netsoul service seems down"
+	sleep 10
+    else
+	print "Connecting with ns_auth"
+    fi
+
     if [ -n "$user" ]
     then
-	message "Launching ns_auth with user $user"
-	ns_auth -u $user
+	ns_auth -u $user &> /dev/null
     else
-	message "Launching ns_auth"
-	ns_auth
+	ns_auth &> /dev/null
     fi
-    sleep 1
-    ping_network
+
+    sleep 4
+
+    if ping -q -w 2 ${remote_ip} &> /dev/null
+    then
+	ping_network
+    else
+	tries=$(( tries + 1 ))
+	ping_ns
+    fi
 }
 
 ping_network()
 {
     if ping -q -w 3 ${remote_ip} &> /dev/null
     then
-	print "Network up" 4
+	tries=0
+	print "Network up"
 	sleep 4
 	ping_network
     else
-        print "Failed to contact network" 5
+        print "Failed to contact network"
 	ping_ns
     fi
 }
 
 print()
 {
-    if [ $msg -ne $2 ]
+    if [ "$msg" != "$1" ]
     then
 	logger "Netsoul: $1"
 	if [ "$verbose" = true ]
 	then
-	    echo "Netsoul: $1"
+	    echo "[Netsoul] $1"
 	fi
 	notify-send 'Netsoul' "$1" --icon=dialog-information -t 2000
     fi
-    msg=$2
+    msg=$1
 }
 
 message()
 {
     if [ "$verbose" = true ]
     then
-	logger "Netsoul: $1"
-	echo "Netsoul: $1"
+	logger "[Netsoul] $1"
+	echo "[Netsoul] $1"
     fi
 }
 
-network_wait
+echo "[Netsoul] Script version $version, report suggestions and bugs on https://github.com/alpha14/epitech"
+
+if ping -q -w 1 ${remote_ip} &> /dev/null
+then
+    ping_network
+else
+    network_wait
+fi
