@@ -1,5 +1,4 @@
-#!/usr/bin/env python3.3
-
+#!/usr/bin/env python3
 # Copyright (c) 2013 Emmanuel Vadot <elbarto@bocal.org>
 
 import socket
