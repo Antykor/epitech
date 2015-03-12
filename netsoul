@@ -1,18 +1,23 @@
 #!/bin/sh
 #
-# Description: Bash script to connect automatically to the netsoul server
+# Description: Shell script to connect automatically to the netsoul server
 # You need a modified ns_auth to use this script
 #
 # Written By: Alpha14 (contact@alpha14.com)
-# (1-2015)
+# (3-2015)
 
-version=5
+version=6
 remote_ip="google.fr"
 ns_server="ns-server.epitech.net"
+# ns_auth location
+ns_auth="ns_auth"
 msg=0
 verbose='false'
 user=''
 tries=0
+
+command -v $ns_auth >/dev/null 2>&1 ||
+{ echo "ns_auth not Found. Aborting." >&2; exit 1; }
 
 # Arguments
 while getopts 'u:v' flag; do
@@ -29,7 +34,7 @@ control_c()
     exit $?
 }
 
-# Trap keyboard interrupt (CTRL+C)
+# Trap keyboard interrupt
 trap control_c SIGINT
 
 network_wait()
@@ -94,9 +99,9 @@ ns_connect()
 
     if [ -n "$user" ]
     then
-	ns_auth -u $user &> /dev/null
+	$ns_auth -u $user &> /dev/null
     else
-	ns_auth &> /dev/null
+	$ns_auth &> /dev/null
     fi
 
     sleep 4
