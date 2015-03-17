@@ -28,6 +28,11 @@ while getopts 'u:v' flag; do
   esac
 done
 
+xping()
+{
+    ping -q -w 2 $1 &> /dev/null
+}
+
 control_c()
 {
     message "Exiting (SIGINIT)"
@@ -52,7 +57,7 @@ network_wait()
 
 ping_ns()
 {
-    if ping -q -w 2 ${gateway} &> /dev/null
+    if xping ${gateway}
     then
 	wait_ns
     else
@@ -65,7 +70,7 @@ ping_ns()
 
 wait_ns()
 {
-    if ping -q -w 2 ${ns_server} &> /dev/null
+    if xping ${ns_server}
     then
 	ping_remote
     else
@@ -77,7 +82,7 @@ wait_ns()
 
 ping_remote()
 {
-    if ping -q -w 2 ${remote_ip} &> /dev/null
+    if xping ${remote_ip}
     then
 	ping_network
     else
@@ -106,7 +111,7 @@ ns_connect()
 
     sleep 4
 
-    if ping -q -w 2 ${remote_ip} &> /dev/null
+    if xping ${remote_ip}
     then
 	ping_network
     else
@@ -117,7 +122,7 @@ ns_connect()
 
 ping_network()
 {
-    if ping -q -w 3 ${remote_ip} &> /dev/null
+    if xping ${remote_ip}
     then
 	tries=0
 	print "Network up"
@@ -154,7 +159,7 @@ message()
 
 echo "[Netsoul] Script version $version, report suggestions and bugs on https://github.com/alpha14/epitech"
 
-if ping -q -w 1 ${remote_ip} &> /dev/null
+if xping ${remote_ip}
 then
     ping_network
 else
