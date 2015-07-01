@@ -6,14 +6,14 @@
 # Written By: Alpha14 (contact@alpha14.com)
 #
 
-version=7.1
+version=7.2
 remote_ip="google.fr"
 ns_server="ns-server.epitech.net"
 ns_auth="ns_auth" # ns_auth location
 #internal variables
 msg=0
 verbose='false'
-user=''
+user="${LOGIN:-$USER}"
 tries=0
 
 command -v $ns_auth 2>&1 >/dev/null ||
@@ -102,13 +102,7 @@ ns_connect()
 	print "Connecting with ns_auth"
     fi
 
-    if [ -n "$user" ]
-    then
-	$ns_auth -u $user 2>&1 >/dev/null
-    else
-	$ns_auth 2>&1 >/dev/null
-    fi
-
+    $ns_auth -u $user 2>&1 >/dev/null
     sleep 4
 
     if xping ${remote_ip}
