@@ -1,0 +1,15 @@
+#!/bin/sh
+
+login=${LOGIN:-$USER}
+repo=$1
+[ $# -lt 1 ] && echo "Usage : $0 repository [users ...]" && exit 1;
+echo "Creating '$repo' for $login"
+blih -u $login repository create $repo &&
+blih -u $login repository setacl $repo ramassage-tek r || exit 1;
+shift 1
+for user in $@
+do
+    blih repository setacl $repo $user rw
+done
+blih -u $login repository getacl $repo &&
+git clone git@git.epitech.eu:/$login/$repo && cd $repo
